@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.content_weather.*
 import weather.com.weatherapp.Location.WeatherLocationActivity
 import weather.com.weatherapp.R
 import weather.com.weatherapp.network.NetworkManager
-import java.util.*
 
 const val REQUEST_LOCATION = 777
 class WeatherActivity : AppCompatActivity(), WeatherView {
@@ -28,7 +27,6 @@ class WeatherActivity : AppCompatActivity(), WeatherView {
         fab.setOnClickListener { _ ->
             weatherPresenter.getWeatherByCity("Bangalore,in")
         }
-
         weatherPresenter.getWeatherByCity("Bangalore,in")
     }
 
@@ -67,6 +65,8 @@ class WeatherActivity : AppCompatActivity(), WeatherView {
         temperature.text =temprature
         details.text = detail
         last_updated.text = currdate
+        weatherinfonotpresent.visibility = View.GONE
+        weatherinfopresent.visibility = View.VISIBLE
     }
 
     override fun updateWeatherInfoNotPresent() {

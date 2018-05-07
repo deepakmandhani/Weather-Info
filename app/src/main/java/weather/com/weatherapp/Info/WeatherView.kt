@@ -1,7 +1,5 @@
 package weather.com.weatherapp.Info
 
-import weather.com.weatherapp.data.WeatherMapApiResponse
-
 /**
  * Created by deepak.mandhani on 05/05/18.
  */

@@ -28,7 +28,6 @@ open class CityListRecyclerViewAdapter(private val context: Context, private val
             else
                 holder.view.fav_icon.setImageDrawable(context.getDrawable(R.mipmap.favourite_deselected))
         })
-
     }
 
     override fun getItemCount(): Int = list.size
@@ -37,11 +36,9 @@ open class CityListRecyclerViewAdapter(private val context: Context, private val
         CityViewHolder(LayoutInflater.from(context).inflate(R.layout.adapter_city_list_item, parent, false))
 
     open class CityViewHolder(public var view: View) : RecyclerView.ViewHolder(view) {
-
         fun bindData(name: String?, icon: Drawable) {
             view.city_name.text = name
             view.fav_icon.setImageDrawable(icon)
         }
-
     }
 }

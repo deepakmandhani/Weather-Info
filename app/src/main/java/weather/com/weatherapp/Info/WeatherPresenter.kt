@@ -57,5 +57,4 @@ class WeatherPresenter(val view: WeatherView,
             view.setWeatherIcon(id)
         }
     }
-
 }
