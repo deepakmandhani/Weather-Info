@@ -8,5 +8,7 @@ import weather.com.weatherapp.data.WeatherMapApiResponse
 interface WeatherView {
     fun showLoader()
     fun hideLoader()
-    fun updateWeatherInfo(response: WeatherMapApiResponse)
+    fun updateWeatherInfo(cityName: String, temprature: String, detail: String, currdate: String)
+    fun setWeatherIcon(id: Int)
+    fun updateWeatherInfoNotPresent()
 }

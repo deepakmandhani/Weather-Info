@@ -20,7 +20,7 @@ class WeatherPresenterTest {
     lateinit var view: WeatherView
     lateinit var service: WeatherService
     lateinit var scheduler: TestScheduler
-    val city = "Bangalore,in"
+    private val city = "Bangalore,in"
 
     @Before
     fun initializations() {
@@ -30,6 +30,7 @@ class WeatherPresenterTest {
         scheduler = TestScheduler()
         presenter = WeatherPresenter(view, service, scheduler, scheduler)
     }
+
     @Test
     fun getWeatherByCity() {
         //when
@@ -43,18 +44,14 @@ class WeatherPresenterTest {
         scheduler.triggerActions()
 
         verify(view).hideLoader()
-        verify(view).updateWeatherInfo(response)
+        verify(view).updateWeatherInfo(eq(city), eq(city), eq(city), eq(city))
+        verify(view).setWeatherIcon(eq(1))
+
+/*        verify(view).hideLoader()
+        verify(view).updateWeatherInfoNotPresent()*/
 
         verify(view, times(0)).showLoader()
         verify(view, never()).showLoader()
-    }
-
-    @Test
-    fun getView() {
-    }
-
-    @Test
-    fun getService() {
     }
 
 }

@@ -20,7 +20,12 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_weather" />
+    <include
+        android:id="@+id/weatherinfopresent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        layout="@layout/content_weather"/>
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -28,6 +33,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:id="@+id/weatherinfonotpresent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/weathernotpresenticon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/weather_info_not_available"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="18sp"
+            android:text="@string/place_not_found"/>
+
+    </LinearLayout>
 
 
     <android.support.design.widget.FloatingActionButton

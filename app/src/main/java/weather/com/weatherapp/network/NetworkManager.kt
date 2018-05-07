@@ -13,7 +13,7 @@ class NetworkManager {
     companion object {
         private var BASE_URL: String = "http://openweathermap.org/data/2.5/"
 
-        fun provieRetrofit(): Retrofit {
+        private fun provieRetrofit(): Retrofit {
             return Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
