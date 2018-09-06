@@ -1,5 +1,6 @@
 package weather.com.weatherapp.Info
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 
 import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.content_weather.*
+import weather.com.weatherapp.Location.WEATHER_CITY
 import weather.com.weatherapp.Location.WeatherLocationActivity
 import weather.com.weatherapp.R
 import weather.com.weatherapp.network.NetworkManager
@@ -17,13 +19,14 @@ import weather.com.weatherapp.network.NetworkManager
 const val REQUEST_LOCATION = 777
 class WeatherActivity : AppCompatActivity(), WeatherView {
 
+    lateinit var weatherPresenter: WeatherPresenter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
         setSupportActionBar(toolbar)
 
-        val weatherPresenter = WeatherPresenter(this, NetworkManager.provideWeatherService())
-
+        weatherPresenter = WeatherPresenter(this, NetworkManager.provideWeatherService())
         fab.setOnClickListener { _ ->
             weatherPresenter.getWeatherByCity("Bangalore,in")
         }
@@ -50,6 +53,10 @@ class WeatherActivity : AppCompatActivity(), WeatherView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_LOCATION && resultCode == Activity.RESULT_OK) {
+            val cityName: String = intent.getStringExtra(WEATHER_CITY)
+            weatherPresenter.getWeatherByCity(cityName)
+        }
     }
 
     override fun showLoader() {

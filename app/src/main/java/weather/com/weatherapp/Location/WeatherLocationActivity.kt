@@ -1,5 +1,6 @@
 package weather.com.weatherapp.Location
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.support.design.widget.Snackbar
@@ -18,8 +19,19 @@ import android.view.ViewGroup
 import weather.com.weatherapp.R
 import kotlinx.android.synthetic.main.activity_weather_location.*
 import kotlinx.android.synthetic.main.fragment_weather_location.*
+import weather.com.weatherapp.db.City
+import weather.com.weatherapp.db.DatabaseService
+import android.content.DialogInterface
+import android.text.InputType
+import android.support.v7.app.AlertDialog
+import android.widget.EditText
 
-class WeatherLocationActivity : AppCompatActivity() {
+
+
+const val WEATHER_CITY = "weather_city"
+class WeatherLocationActivity : AppCompatActivity(), WeatherLocationView {
+
+    val presenter = WeatherLocationPresenter(this, DatabaseService())
 
     companion object {
         fun newActivityInstance(context: Context): Intent = Intent(context, WeatherLocationActivity::class.java)
@@ -30,38 +42,55 @@ class WeatherLocationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_weather_location)
         setSupportActionBar(toolbar)
 
-        container.adapter = SectionsPagerAdapter(supportFragmentManager)
+        val fragmentList = java.util.ArrayList<Fragment>()
+        fragmentList.add(CityHolderFragment.newInstance(0))
+        fragmentList.add(CityHolderFragment.newInstance(1))
+        container.adapter = SectionsPagerAdapter(supportFragmentManager, fragmentList)
         header.setupWithViewPager(container)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        fab.setOnClickListener { _ ->
+            openInputNewCityDialog()
         }
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_settings) {
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+    private fun openInputNewCityDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Add new city")
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+        builder.setPositiveButton("Add", DialogInterface.OnClickListener { _, _ -> addNewCity(input.text.toString()) })
+        builder.show()
     }
 
-    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private fun addNewCity(city: String) {
 
-        override fun getItem(position: Int): Fragment {
-            return if(position == 0) CityHolderFragment.newInstance(position)
-            else CityHolderFragment.newInstance( 1)
-        }
+        //val fragment = supportFragmentManager.findFragmentById(R.id.container) as CityHolderFragment
+        //val currFragment: CityHolderFragment = supportFragmentManager.findFragmentByTag(“android:switcher:” + header + “:” + container.getCurrentItem)
+        //container.adapter.instantiateItem(container, container.currentItem)
 
-        override fun getCount(): Int {
-            return 2
-        }
+        //val isFav: Boolean = "All".contentEquals(container.adapter.getPageTitle(container.currentItem)
+        presenter.addCity(city, container.currentItem == 1)
+        ((container.adapter as SectionsPagerAdapter).getItem(container.currentItem) as CityHolderFragment).updateCityListView()
 
-        override fun getPageTitle(position: Int): CharSequence {
-            return if(position == 0) "All" else "Favouritie"
-        }
+
+        //(fragmentManager.findFragmentByTag("android:switcher:"+container+":"+container.currentItem) as CityHolderFragment).updateCityListView()
+    }
+
+    fun sendCityToFetchWheather(cityName: String?) {
+        setResult(Activity.RESULT_OK, Intent().putExtra(WEATHER_CITY, cityName))
+        finish()
+    }
+
+    inner class SectionsPagerAdapter(fm: FragmentManager, val fragmentList: ArrayList<Fragment>) : FragmentPagerAdapter(fm) {
+
+        override fun getItem(position: Int): Fragment = fragmentList[position]
+
+        override fun getCount(): Int =  fragmentList.size
+
+        override fun getPageTitle(position: Int): CharSequence =  if(position == 0) "All" else "Favouritie"
+
     }
 
     class CityHolderFragment : Fragment() {
@@ -69,18 +98,29 @@ class WeatherLocationActivity : AppCompatActivity() {
         private var adapter: CityListRecyclerViewAdapter? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_weather_location, container, false)
-            //rootView.section_label.text = getString(R.string.section_format, arguments.getInt(ARG_SCREEN_NUMBER))
-            return rootView
-        }
+                                  savedInstanceState: Bundle?): View? = inflater.inflate(R.layout.fragment_weather_location, container, false)
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
             cityrecyclerview.setHasFixedSize(true)
             cityrecyclerview.layoutManager = LinearLayoutManager(activity)
-            adapter = CityListRecyclerViewAdapter(context, listOf())
+            adapter = CityListRecyclerViewAdapter(context, ArrayList<City>())
             cityrecyclerview.adapter = adapter
+        }
+
+        override fun onResume() {
+            super.onResume()
+            adapter?.addItems(getCityListAsPerTab())
+        }
+
+        private fun getCityListAsPerTab(): ArrayList<City> =
+            if (arguments.getInt(ARG_SCREEN_NUMBER) == 0)
+                (activity as WeatherLocationActivity).presenter.getAllCity()
+            else
+                (activity as WeatherLocationActivity).presenter.getFavCity()
+
+        fun updateCityListView() {
+            adapter?.addItems(getCityListAsPerTab())
         }
 
         companion object {
